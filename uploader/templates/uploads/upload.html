@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="row justify-content-center">
+	<div class="col-12 col-md-6">
+		<h1>Upload New Media</h1>
+		<div class="card">
+			<div class="card-body">
+				<form class="" method="POST" enctype="multipart/form-data">
+					<div class="form-group">
+						<label for="title">Title:</label>
+						<input class="form-control" type="text" name="title" placeholder="Enter a title" required="required">
+					</div>
+					<div class="form-group">
+						<label for="media">Media:</label>
+						<input type="file" class="form-control-file" id="media" name="media" multiple accept="image/*,video/*,capture=camcorder">
+						<small class="form-text text-muted">You can upload images, videos, both, and multiple at once!</small>
+					</div>
+					<button type="submit" class="btn btn-primary btn-large">Upload</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+{% endblock %}
