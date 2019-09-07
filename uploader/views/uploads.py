@@ -41,4 +41,5 @@ def upload():
 						_file.media_type = 'image'
 					_file.save(force_insert=True)
 				success('Media uploaded successfully.')
+			return redirect(url_for('.list'))
 	return render_template('uploads/upload.html')
