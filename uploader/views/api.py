@@ -32,5 +32,6 @@ def delete_upload(upload_id):
 		file.delete_instance()
 		rtn['deleted'] += 1
 	upload.delete_instance()
+	rtn['success'] = True
 
 	return jsonify(rtn)
