@@ -1,0 +1,66 @@
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+    background-color: #B2E1EC;
+    color: #1B4C25;
+    font-family: 'Kavivanar', cursive;
+}
+
+.btn.btn-primary,
+.btn-primary:not(:disabled):not(.disabled):active,
+    {
+    background-color: #1B4C25;
+}
+
+.logo-wrap {
+    height: 100px;
+    display: flex;
+}
+
+.logo {
+    height: 100px;
+}
+
+.upload {
+    border-bottom: 5px solid #1B4C25;
+}
+
+.files {
+	display: flex;
+	justify-content: flex-start;
+	flex-flow: row wrap;
+}
+
+.grid-sizer,
+.grid-item {
+    /*border: 2px solid #1B4C25;*/
+    width: 33.3333%;
+    float: left;
+}
+
+.grid-sizer {
+	display: none;
+}
+
+stream {
+    width: 100%;
+    height: auto;
+}
+
+.grid-item a {
+	position: relative;
+}
+
+.grid-item img {
+    display: block;
+    max-width: 100%;
+}
+
+.grid-item .encoding {
+	width: 100%;
+	text-align: center;
+	color: #1B4C25;
+}
