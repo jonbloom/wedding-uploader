@@ -1,6 +1,7 @@
 from peewee import *
 from .config import db, S3_PUBLIC_PATH
 from uuid import uuid4
+import datetime
 
 
 class BaseModel(Model):
@@ -32,6 +33,7 @@ class Upload(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)
 	user = ForeignKeyField(User, backref="uploads")
 	title = TextField()
+	timestamp = DateTimeField(default=datetime.datetime.now)
 	
 class File(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)

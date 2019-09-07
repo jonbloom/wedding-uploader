@@ -45,6 +45,14 @@ def upload_to_cf(url, title):
 	req = requests.post('https://api.cloudflare.com/client/v4/accounts/{account_id}/stream/copy'.format(account_id=CLOUDFLARE_ACCOUNT_ID), headers=headers, json=json)
 	return req.json()['result']['uid']
 
+def delete_from_cf(uid):
+	headers = {
+		'X-Auth-Key': CLOUDFLARE_API_KEY,
+		'X-Auth-Email': CLOUDFLARE_EMAIL,
+	}
+	req = requests.delete('https://api.cloudflare.com/client/v4/accounts/{account_id}/media/{media_uid}'.format(account_id=CLOUDFLARE_ACCOUNT_ID, media_uid=uid), headers=headers, json=json)
+	return req.status_code == 200
+
 def cf_info(uid):
 	headers = {
 		'X-Auth-Key': CLOUDFLARE_API_KEY,
@@ -54,8 +62,16 @@ def cf_info(uid):
 	return req.json()
 
 
-def delete_file(key):
-	s3_client.delete_object(Bucket=S3_BUCKET, Key=key)
+def delete_file(file):
+	s3_client.delete_object(Bucket=S3_BUCKET, Key=file.s3_key)
+	if file.media_type == 'video':
+		headers = {
+			'X-Auth-Key': CLOUDFLARE_API_KEY,
+			'X-Auth-Email': CLOUDFLARE_EMAIL,
+		}
+		req = requests.delete('https://api.cloudflare.com/client/v4/accounts/{account_id}/media/{media_uid}'.format(account_id=CLOUDFLARE_ACCOUNT_ID, media_uid=file.cf_uid), headers=headers)
+		return req.status_code == 200
+	return True
 
 def set_permissions(key_name):
 	s3_client.put_object_acl(ACL='public-read', Bucket=S3_BUCKET, Key=key_name)

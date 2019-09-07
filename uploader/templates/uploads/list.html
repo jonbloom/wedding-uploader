@@ -2,49 +2,25 @@
 
 {% block head %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-<style>
-	.grid-sizer,
-	.grid-item {
-	  width: 33.333%;
-	}
-
-	stream {
-		width: 100%;
-		height: auto;
-	}
-
-	.grid-item {
-	  float: left;
-	  position: relative;
-	}
-
-	.grid-item .encoding {
-		color: white;
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-		text-align: center;
-	}
-
-	.grid-item img {
-	  display: block;
-	  max-width: 100%;
-	}
-</style>
 {% endblock %}
 
 {% block body %}
-<h1>Uploads</h1>
-<h2><a href="{{url_for('.upload')}}">Upload</a></h2>
+<h1><a href="{{url_for('.upload')}}">Upload Images and Videos</a></h1>
 <div class="uploads">
 	{% raw %}
-	<div class="upload" v-for="upload in uploads">
-		<div class="upload-title">{{upload.title}}</div>
-		<div class="uploaded-by">{{upload.user.first_name}} {{upload.user.last_name}}</div>
+	<div class="upload mb-5 pb-3" v-for="upload in uploads">
+		<h3 class="upload-title">{{upload.title}}</h3>
+		<h4 class="uploaded-by">Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h4>
+		{% endraw %}
+		{% if current_user.is_admin %}
+		<h5 class="text-danger" @click="deleteUpload(upload.uuid)"> Delete</h5>
+		{% endif %}
+		{% raw %}
 
-		<div class="files">
+		<div class="files row justify-content-around">
+			<div class="grid-sizer"></div>
 			<template v-for="file in upload.files">
-				<div class="grid-item" v-if="file.media_type == 'image'">
+				<div class="grid-item " v-if="file.media_type == 'image'">
 					<a :href="s3(file.s3_key)" :data-fancybox="upload.uuid">
 						<img :src="s3(file.s3_key)">
 					</a>
@@ -59,6 +35,7 @@
 					</a>
 				</div>
 			</template>
+			
 		</div>
 	</div>
 	{% endraw %}
@@ -67,39 +44,11 @@
 	
 </div>
 
-{% raw %}
-
-<script id="video-template" type="x-tmpl-mustache">
-	<div class="grid-item">
-		<a href="https://watch.cloudflarestream.com/{{uid}}" data-fancybox data-type="iframe">
-			<img src="{{thumbnail}}">
-		</a>
-	</div>
-</script>
-
-<script id="video-thumb-template" type="x-tmpl-mustache">
-	<div class="grid-item">
-		<div class="video encoding" style="background-image: url('{{thumbnail}}');">
-			<div class="status">{{status.step}}</div>
-		</div>
-	</div>
-</script>
-
-<script id="image-template" type="x-tmpl-mustache">
-	<div class="grid-item">
-		<a href="https://jonbloom.sfo2.cdn.digitaloceanspaces.com/{{s3_key}}" data-fancybox>
-			<img src="https://jonbloom.sfo2.cdn.digitaloceanspaces.com/{{s3_key}}" />
-		</a>
-	</div>
-</script>
-
-{% endraw %}
 {% endblock %}
 
 {% block scripts %}
 <!-- <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script> -->
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.2/mustache.min.js" integrity="sha256-VdtXwOlGp0Sy+im6z9Ds1pmV28hq35lL+NWztNFgCfU=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
@@ -121,46 +70,46 @@
 				},
 				percent: function(percent){
 					return parseFloat(percent).toFixed(0) + '%';
+				},
+				getData: function(){
+					var self = this;
+					jQuery.ajax({
+						url: '/api/uploads',
+						dataType: 'json'
+					}).done(function(data){
+						self.uploads = data.uploads;
+						self.reflow();
+					});
+				},
+				reflow: function(){
+					jQuery('.files').each(function(){
+						jQuery(this).masonry({
+							itemSelector: '.grid-item'
+						})
+					});
+				},
+				deleteUpload: function(uuid){
+					if (confirm('are you sure?')){
+						var self = this;
+						jQuery.ajax({
+							url: '/api/upload/'+uuid,
+							type: 'DELETE',
+							dataType: 'json'
+						}).done(function(data){
+							console.log(data);
+							self.getData();
+						})
+					}
 				}
 			},
 			created: function(){
 				var self = this;
-				jQuery.ajax({
-					url: '/api/uploads',
-					dataType: 'json'
-				}).done(function(data){
-					self.uploads = data.uploads;
-				});
+				setInterval(function(){
+					self.getData();
+				}, 5000);
+				self.getData();
 			},
-			mounted: function(){
-				jQuery('.files').each(function(){
-					jQuery(this).masonry({
-						itemSelector: '.grid-item'
-					})
-				});
-			}
 		});
-
-			// var uploads = data.uploads;
-			// for (var i = 0; i < uploads.length; i++){
-			// 	var container = jQuery('<div class="upload"><h1>+'uploads[i].title'+</h1></div>');
-			// 	for (var j = 0; j < uploads[i].files.length; j++){
-			// 		var file = uploads[i].files[j];
-			// 		if (file.media_type == 'image'){
-			// 			container.append(Mustache.render(jQuery('#image-template').html(), file))
-			// 		} else {
-			// 			var videoInfo = file.cf_data.result;
-			// 			if (videoInfo.readyToStream){
-			// 				container.append(Mustache.render(jQuery('#video-template').html(), videoInfo));
-			// 			} else {
-			// 				container.append(Mustache.render(jQuery('#video-thumb-template').html(), videoInfo));
-			// 			}
-			// 		}
-			// 	}
-			// }
-			// jQuery('.uploads').masonry({
-			// 	itemSelector: '.col'
-			// });
 
 </script>
 {% endblock %}
