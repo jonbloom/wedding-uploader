@@ -34,6 +34,8 @@ class Upload(BaseModel):
 	user = ForeignKeyField(User, backref="uploads")
 	title = TextField()
 	timestamp = DateTimeField(default=datetime.datetime.now)
+	total_files = IntegerField(default=0)
+	uploaded_files = IntegerField(default=0)
 	
 class File(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)

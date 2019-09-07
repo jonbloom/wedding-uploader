@@ -23,9 +23,9 @@ def upload():
 		_upload = Upload()
 		_upload.user = current_user.uuid
 		_upload.title = request.form.get('title')
-		print(_upload.save(force_insert=True))
-		print(len(request.files.getlist('media')))
-		print(len(request.files))
+		_upload.total_files = len(request.files.getlist('media'))
+		_upload.save(force_insert=True)
+
 		if 'media' in request.files:
 			for i, file in enumerate(request.files.getlist('media')):
 				print(i)
@@ -40,6 +40,8 @@ def upload():
 					else:
 						_file.media_type = 'image'
 					_file.save(force_insert=True)
+					_upload.uploaded_files = _upload.uploaded_files + 1
+					_upload.save()
 				success('Media uploaded successfully.')
 			return redirect(url_for('.list'))
 	return render_template('uploads/upload.html')
