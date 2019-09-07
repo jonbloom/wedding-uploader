@@ -18,6 +18,11 @@ def list_uploads():
 				file['cf_data'] = cf_info(file['cf_uid'])
 	return jsonify(uploads)
 
+@api_bp.route('/upload/<upload_id>/progress')
+def upload_progress(upload_id):
+	upload = Upload.get(uuid=upload_id)
+	return jsonify(model_to_dict(upload, exclude=[Upload.user]))
+
 @api_bp.route('/upload/<upload_id>', methods=['DELETE'])
 def delete_upload(upload_id):
 	rtn = {
