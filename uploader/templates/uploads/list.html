@@ -26,13 +26,16 @@
 					</a>
 				</div>
 				<div class="grid-item" v-if="file.media_type == 'video'">
-					<a :href="cfGif(file.cf_data.result.uid)" v-if="!file.cf_data.result.readyToStream" :data-fancybox="upload.uuid">
-						<img :src="cfGif(file.cf_data.result.uid)">
-						<div class="encoding">Encoding... {{percent(file.cf_data.result.status.pctComplete)}}</div>
-					</a>
-					<a :href="cfEmbed(file.cf_data.result.uid)" v-if="file.cf_data.result.readyToStream" :data-fancybox="upload.uuid" data-type="iframe">
-						<img :src="cfGif(file.cf_data.result.uid)">
-					</a>
+					<div class="loading" v-if="!file.cf_data">loading...</div>
+					<template v-else>
+						<a :href="cfGif(file.cf_data.result.uid)" v-if="!file.cf_data.result.readyToStream" :data-fancybox="upload.uuid">
+							<img :src="cfGif(file.cf_data.result.uid)">
+							<div class="encoding">Encoding... {{percent(file.cf_data.result.status.pctComplete)}}</div>
+						</a>
+						<a :href="cfEmbed(file.cf_data.result.uid)" v-if="file.cf_data.result.readyToStream" :data-fancybox="upload.uuid" data-type="iframe">
+							<img :src="cfGif(file.cf_data.result.uid)">
+						</a>
+					</template>
 				</div>
 			</template>
 			
@@ -50,7 +53,7 @@
 <!-- <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script> -->
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
 
 <script type="text/javascript">
 	var app = new Vue({
@@ -73,13 +76,27 @@
 				},
 				getData: function(){
 					var self = this;
-					jQuery.ajax({
-						url: '/api/uploads',
-						dataType: 'json'
-					}).done(function(data){
-						self.uploads = data.uploads;
+					api.get('uploads').then(function(response){
+						self.uploads = response.data.uploads;
+						for (var i = 0; i < self.uploads.length; i++){
+							for (var j = 0; j < self.uploads[i].files.length; j++){
+
+								if (self.uploads[i].files[j].media_type == 'video'){
+									self.uploads[i].files[j].cf_data = false;
+									self.updateVideo(self.uploads[i].files[j].cf_uid, i, j);
+								}
+							}
+						}
 						self.reflow();
 					});
+				},
+				updateVideo: function(uid, uploadIdx, fileIdx){
+					var self = this;
+					api.get('cf_info/'+self.uploads[uploadIdx].files[fileIdx].cf_uid).then(function(response){
+						self.uploads[uploadIdx].files[fileIdx].cf_data = response.data;
+						self.$forceUpdate();
+					});
+
 				},
 				reflow: function(){
 					jQuery('.files').each(function(){
@@ -91,23 +108,15 @@
 				deleteUpload: function(uuid){
 					if (confirm('are you sure?')){
 						var self = this;
-						jQuery.ajax({
-							url: '/api/upload/'+uuid,
-							type: 'DELETE',
-							dataType: 'json'
-						}).done(function(data){
+						api.delete('upload/'+uuid).then(function(response){
 							console.log(data);
 							self.getData();
-						})
+						});
 					}
 				}
 			},
 			created: function(){
-				var self = this;
-				setInterval(function(){
-					self.getData();
-				}, 5000);
-				self.getData();
+				this.getData();
 			},
 		});
 

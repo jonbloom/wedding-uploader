@@ -3,6 +3,7 @@ from flask_login import current_user
 from flask import flash
 from uuid import uuid4
 import requests
+import os
 
 def success(text):
 	flash(text,'success')
@@ -25,11 +26,21 @@ def allowed_file(file):
 		warn('Image must be of type: {0}'.format(', '.join(ALLOWED_EXTENSIONS)))
 	return allowed
 
-def upload_to_s3(to_upload):
-	key = get_filename(to_upload, uuid4())
-	s3_client.upload_fileobj(to_upload, S3_BUCKET, key, ExtraArgs={'ContentType': to_upload.mimetype})
-	set_permissions(key)
-	return key
+def upload_to_s3(file, filename, mimetype):
+	with open('./tmp/'+filename, 'rb') as to_upload:
+		print('uploading to s3', file, to_upload)
+		key = get_filename(filename, uuid4())
+		print(key)
+		s3_client.upload_fileobj(to_upload, S3_BUCKET, key, ExtraArgs={'ContentType': mimetype})
+		set_permissions(key)
+		file.s3_key = key
+		if filename.lower().endswith('.mp4') or filename.lower().endswith('.mov'):
+			file.cf_uid = upload_to_cf(file.get_s3_url(), file.upload.title)
+		file.uploaded = True
+		file.save()
+		print(file.s3_key)
+		os.unlink('./tmp/'+filename)
+		return True
 
 def upload_to_cf(url, title):
 	headers = {
@@ -77,5 +88,5 @@ def set_permissions(key_name):
 	s3_client.put_object_acl(ACL='public-read', Bucket=S3_BUCKET, Key=key_name)
 
 def get_filename(file, new_name):
-	extension = file.filename.rsplit('.', 1)[1]
+	extension = file.rsplit('.', 1)[1]
 	return '{0}/{1}.{2}'.format(S3_ROOT_PATH, new_name, extension.lower())

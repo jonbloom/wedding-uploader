@@ -1,26 +1,102 @@
 {% extends 'base.html' %}
 {% block body %}
-<div class="row justify-content-center">
-	<div class="col-12 col-md-6">
-		<h1>Upload New Media</h1>
-		<div class="card">
-			<div class="card-body">
-				<form class="" method="POST" enctype="multipart/form-data">
-					<div class="form-group">
-						<label for="title">Title:</label>
-						<input class="form-control" type="text" name="title" placeholder="Enter a title" required="required">
-					</div>
-					<div class="form-group">
-						<label for="media">Media:</label>
-						<input type="file" class="form-control-file" id="media" name="media" multiple accept="image/*,video/*,capture=camcorder">
-						<small class="form-text text-muted">You can upload images, videos, both, and multiple at once!</small>
-					</div>
-					<button type="submit" class="btn btn-primary btn-large">Upload</button>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
-
-
-{% endblock %}
+{% raw %}
+<div class="row justify-content-center upload-form">
+    <div class="col-12 col-md-6">
+        <h1>Upload New Media</h1>
+        <div class="card">
+            <div class="card-body">
+                <div class="form" v-if="!uploading">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <input class="form-control" type="text" name="title" placeholder="Enter a title" required="required" v-model="title">
+                    </div>
+                    <div class="form-group">
+                        <label for="media">Media:</label>
+                        <input type="file" class="form-control-file" id="media" name="media" multiple accept="image/*,video/*,capture=camcorder" v-on:change="handleFileUploads()" ref="media">
+                        <small class="form-text text-muted">You can upload images, videos, both, and multiple at once!</small>
+                    </div>
+                    <a class="btn btn-primary btn-large" v-on:click="submit">Upload</a>
+                </div>
+                <div class="progress-wrap" v-if="uploading">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-animated" :style="{width: uploadPercentage/2 + '%'}"> Local: {{uploadPercentage}}%</div>
+                        <div class="progress-bar progress-bar-animated" :style="{width: cloudUploadProgress/2 + '%'}"> Cloud: {{cloudUploadProgress.toFixed(0)}}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endraw %}
+    {% endblock %}
+    {% block scripts %}
+    <script>
+    var app = new Vue({
+        el: '.upload-form',
+        data: {
+            title: '',
+            media: [],
+            upload: null,
+            uploading: false,
+            uploadPercentage: 0
+        },
+        methods: {
+            handleFileUploads: function() {
+                this.media = this.$refs.media.files;
+            },
+            submit: function() {
+                var self = this;
+                self.uploading = true;
+                var formData = new FormData();
+                formData.append('title', this.title);
+                for (var i = 0; i < this.media.length; i++) {
+                    var file = this.media[i];
+                    formData.append('media', file);
+                }
+                axios.post('/uploads/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    onUploadProgress: function( progressEvent ) {
+                            self.uploadPercentage = parseInt( Math.round( ( progressEvent.loaded * 100 ) / progressEvent.total ) );
+                            console.log(self.uploadPercentage);
+                          }
+                }).then(function(response) {
+                    api.get('upload/' + response.data.upload_id).then(function(response) {
+                        self.upload = response.data;
+                        self.getUpload();
+                    })
+                })
+            },
+            getUpload: function() {
+                var self = this;
+                api.get('upload/' + this.upload.uuid).then(function(response) {
+                    self.upload = response.data;
+                    if (self.progress != 100) {
+                        setTimeout(function() {
+                            self.getUpload()
+                        }, 500);
+                    }
+                })
+            }
+        },
+        computed: {
+            cloudUploadProgress: function() {
+                if (this.uploadPercentage < 100 || this.upload == null) {
+                    return 0;
+                } else {
+                	var uploaded = 0;
+                	for (var i = 0; i < this.upload.files.length; i++){
+                		if (this.upload.files[i].uploaded) uploaded++
+                	}
+                	var percentage = uploaded / this.upload.total_files * 100
+                    if (percentage == 100){
+                    	window.location.href = '/uploads';
+                    }
+                    return percentage;
+                }
+            }
+        }
+    })
+    </script>
+    {% endblock %}

@@ -12,16 +12,17 @@ def list_uploads():
 	uploads = {
 		'uploads': [model_to_dict(u, backrefs=True, exclude=[User.uuid, User.email, User.is_admin, User.authenticated]) for u in Upload.select().order_by(Upload.timestamp.desc())]
 	}
-	for upload in uploads['uploads']:
-		for file in upload['files']:
-			if file['media_type'] == 'video':
-				file['cf_data'] = cf_info(file['cf_uid'])
 	return jsonify(uploads)
 
-@api_bp.route('/upload/<upload_id>/progress')
+@api_bp.route('/cf_info/<uid>')
+def get_cf_info(uid):
+	return jsonify(cf_info(uid))
+
+@api_bp.route('/upload/<upload_id>')
 def upload_progress(upload_id):
 	upload = Upload.get(uuid=upload_id)
-	return jsonify(model_to_dict(upload, exclude=[Upload.user]))
+
+	return jsonify(model_to_dict(upload, backrefs=True, exclude=[Upload.user]))
 
 @api_bp.route('/upload/<upload_id>', methods=['DELETE'])
 def delete_upload(upload_id):

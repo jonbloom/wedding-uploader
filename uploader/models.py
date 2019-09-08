@@ -41,8 +41,10 @@ class File(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)
 	media_type=TextField()
 	upload = ForeignKeyField(Upload, backref="files")
-	s3_key = TextField()
+	s3_key = TextField(null=True)
 	cf_uid = TextField(null=True)
+	uploaded = BooleanField(default=False)
+
 	
 
 	def get_s3_url(self):
