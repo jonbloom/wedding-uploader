@@ -20,7 +20,7 @@ CLOUDFLARE_ACCOUNT_ID = os.getenv('CLOUDFLARE_ACCOUNT_ID')
 
 SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
 
-ALLOWED_EXTENSIONS = set(['jpg', 'mp4', 'mov', 'png'])
+ALLOWED_EXTENSIONS = set(['jpg', 'jpeg', 'mp4', 'mov', 'png', 'heic'])
 
 
 s3_session = boto3.session.Session()
