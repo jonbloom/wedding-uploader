@@ -20,7 +20,7 @@
                 </div>
                 <div class="progress-wrap" v-if="uploading">
                     <div class="progress">
-                        <div class="progress-bar progress-bar-animated" :style="{width: uploadPercentage/2 + '%'}"> Local: {{uploadPercentage}}%</div>
+                        <div class="progress-bar progress-bar-animated" :style="{width: uploadPercentage + '%'}"> Local: {{uploadPercentage}}%</div>
                         <div class="progress-bar progress-bar-animated" :style="{width: cloudUploadProgress/2 + '%'}"> Cloud: {{cloudUploadProgress.toFixed(0)}}%</div>
                     </div>
                 </div>
@@ -62,10 +62,7 @@
                             console.log(self.uploadPercentage);
                           }
                 }).then(function(response) {
-                    api.get('upload/' + response.data.upload_id).then(function(response) {
-                        self.upload = response.data;
-                        self.getUpload();
-                    })
+                	window.location.href = '/uploads';
                 })
             },
             getUpload: function() {
