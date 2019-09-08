@@ -64,3 +64,17 @@ stream {
 	text-align: center;
 	color: #1B4C25;
 }
+
+.grid-item .image {
+    width: 100%;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 33vw;
+}
+
+.grid-item .image img {
+    opacity: 0;
+    max-width: 100%;
+
+}

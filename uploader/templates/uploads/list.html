@@ -9,31 +9,34 @@
 <div class="uploads">
 	{% raw %}
 	<div class="upload mb-5 pb-3" v-for="upload in uploads">
-		<h3 class="upload-title">{{upload.title}}</h3>
-		<h4 class="uploaded-by">Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h4>
+		<h3>{{upload.title}}, Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h3>
 		{% endraw %}
 		{% if current_user.is_admin %}
 		<h5 class="text-danger" @click="deleteUpload(upload.uuid)"> Delete</h5>
 		{% endif %}
 		{% raw %}
 
-		<div class="files row justify-content-around">
+		<div class="files">
 			<div class="grid-sizer"></div>
 			<template v-for="file in upload.files">
 				<div class="grid-item " v-if="file.media_type == 'image'">
 					<a :href="s3(file.s3_key)" :data-fancybox="upload.uuid">
-						<img :src="s3(file.s3_key)">
+						<div class="image" :style="{'background-image': 'url('+s3(file.s3_key)+')'}">
+						</div>
+
 					</a>
 				</div>
 				<div class="grid-item" v-if="file.media_type == 'video'">
 					<div class="loading" v-if="!file.cf_data">loading...</div>
 					<template v-else>
 						<a :href="cfGif(file.cf_data.result.uid)" v-if="!file.cf_data.result.readyToStream" :data-fancybox="upload.uuid">
-							<img :src="cfGif(file.cf_data.result.uid)">
+							<div class="image" :style="{'background-image': 'url('+cfGif(file.cf_data.result.uid)+')'}">
+							</div>
 							<div class="encoding">Encoding... {{percent(file.cf_data.result.status.pctComplete)}}</div>
 						</a>
 						<a :href="cfEmbed(file.cf_data.result.uid)" v-if="file.cf_data.result.readyToStream" :data-fancybox="upload.uuid" data-type="iframe">
-							<img :src="cfGif(file.cf_data.result.uid)">
+							<div class="image" :style="{'background-image': 'url('+cfGif(file.cf_data.result.uid)+')'}">
+							</div>
 						</a>
 					</template>
 				</div>
@@ -109,7 +112,6 @@
 					if (confirm('are you sure?')){
 						var self = this;
 						api.delete('upload/'+uuid).then(function(response){
-							console.log(data);
 							self.getData();
 						});
 					}
