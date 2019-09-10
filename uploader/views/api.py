@@ -24,6 +24,11 @@ def upload_progress(upload_id):
 
 	return jsonify(model_to_dict(upload, backrefs=True, exclude=[Upload.user]))
 
+@api_bp.route('/upload/count')
+def upload_count():
+	uploads = Upload.select()
+	return jsonify({'count': len(uploads)})
+
 @api_bp.route('/upload/<upload_id>', methods=['DELETE'])
 def delete_upload(upload_id):
 	rtn = {

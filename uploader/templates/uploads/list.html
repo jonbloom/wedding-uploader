@@ -87,11 +87,12 @@
 			data: {
 				uploads: [],
 				showToast: false,
+				checking: false
 			},
 			methods: {
 				backToTop: function(){
 					this.showToast = false;
-					window.scrollTo({ top: 0, behavior: 'smooth' });
+					this.getData();
 				},
 				s3: function(key){
 					return "{{S3_PUBLIC_PATH}}"+key;
@@ -106,7 +107,6 @@
 					return parseFloat(percent).toFixed(0) + '%';
 				},
 				getData: function(){
-					var oldAmount = this.uploads.length;
 					var self = this;
 					api.get('uploads').then(function(response){
 						self.uploads = response.data.uploads;
@@ -119,13 +119,23 @@
 								}
 							}
 						}
-						if (oldAmount > 0 && self.uploads.length > oldAmount){
-							self.showToast = true;
-						}
+						
 						self.reflow();
 						self.$forceUpdate();
 						setTimeout(self.getData, 5000);
 					});
+				},
+				checkNewData: function(){
+					var oldAmount = this.uploads.length;
+					if (oldAmount == 0) {
+						this.getData();
+					} else {
+						api.get('uploads/count').then(function(response){
+							if (response.data.count > oldAmount){
+								self.showToast = true;
+							}
+						})
+					}
 				},
 				updateVideo: function(uid, uploadIdx, fileIdx){
 					var self = this;
