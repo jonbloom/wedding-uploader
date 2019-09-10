@@ -32,7 +32,7 @@
 						<a :href="cfGif(file.cf_data.result.uid)" v-if="!file.cf_data.result.readyToStream" :data-fancybox="upload.uuid">
 							<div class="image" :style="{'background-image': 'url('+cfGif(file.cf_data.result.uid)+')'}">
 							</div>
-							<div class="encoding">Encoding... {{percent(file.cf_data.result.status.pctComplete)}}</div>
+							<div class="encoding">Encoding...</div>
 						</a>
 						<a :href="cfEmbed(file.cf_data.result.uid)" v-if="file.cf_data.result.readyToStream" :data-fancybox="upload.uuid" data-type="iframe">
 							<div class="image" :style="{'background-image': 'url('+cfGif(file.cf_data.result.uid)+')'}">
