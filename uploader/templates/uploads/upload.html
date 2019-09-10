@@ -21,7 +21,6 @@
                 <div class="progress-wrap" v-if="uploading">
                     <div class="progress">
                         <div class="progress-bar progress-bar-animated" :style="{width: uploadPercentage + '%'}"> Local: {{uploadPercentage}}%</div>
-                        <div class="progress-bar progress-bar-animated" :style="{width: cloudUploadProgress/2 + '%'}"> Cloud: {{cloudUploadProgress.toFixed(0)}}%</div>
                     </div>
                 </div>
             </div>
