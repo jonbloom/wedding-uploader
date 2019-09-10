@@ -45,6 +45,10 @@
                 this.media = this.$refs.media.files;
             },
             submit: function() {
+                if (!this.valid){
+                    alert('Please make sure you enter a title and select some photos/videos!');
+                    return;
+                }
                 var self = this;
                 self.uploading = true;
                 var formData = new FormData();
@@ -92,6 +96,9 @@
                     }
                     return percentage;
                 }
+            },
+            valid: function(){
+                return this.title.length > 0 && this.media.legnth > 0;
             }
         }
     })
