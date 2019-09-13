@@ -26,13 +26,18 @@
 <h1><a href="{{url_for('.upload')}}">Upload Images and Videos</a></h1>
 <div class="uploads">
 	
-	{% raw %}
-	<div class="upload mb-5 pb-3" v-for="upload in uploads">
+	
+	<div class="upload mb-5 pb-3" v-for="upload in uploads" {% if not current_user.is_admin %} v-if="!upload.reported" {% endif %}>
+		{% raw %}
 		<h3>{{upload.title}}, Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h3>
 		{% endraw %}
 		{% if current_user.is_admin %}
 		<h5 class="text-danger" @click="deleteUpload(upload.uuid)"> Delete</h5>
+		<h5 v-if="upload.reported" @click="approveUpload(upload.uuid)"> Approve</h5>
+
 		{% endif %}
+		<h6 class="text-danger" @click="reportUpload(upload.uuid)"> Report Inappropriate</h6>
+
 		{% raw %}
 
 		<div class="files">
@@ -120,7 +125,7 @@
 							}
 						}
 						
-						self.reflow();
+						// self.reflow();
 						self.$forceUpdate();
 						setTimeout(self.getData, 5000);
 					});
@@ -159,6 +164,22 @@
 						api.delete('upload/'+uuid).then(function(response){
 							self.getData();
 						});
+					}
+				},
+				reportUpload: function(uuid){
+					if (confirm('Reporting this upload will remove it from the feed. Are you sure?')){
+						var self = this;
+						api.post('upload/'+uuid+'/report').then(function(response){
+							self.getData();
+						});
+					}
+				},
+				approveUpload: function(uuid){
+					if (confirm('Approving this upload will put it back in the feed. Are you sure?')){
+						var self = this;
+						api.post('upload/'+uuid+'/approve').then(function(response){
+							self.getData();
+						})
 					}
 				}
 			},

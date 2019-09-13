@@ -29,6 +29,20 @@ def upload_count():
 	uploads = Upload.select()
 	return jsonify({'count': len(uploads)})
 
+@api_bp.route('/upload/<upload_id>/report', methods=['POST'])
+def report_upload(upload_id):
+	upload = Upload.get(uuid=upload_id)
+	upload.reported = True
+	upload.save()
+	return jsonify({'success': True})
+
+@api_bp.route('/upload/<upload_id>/approve', methods=['POST'])
+def approve_upload(upload_id):
+	upload = Upload.get(uuid=upload_id)
+	upload.reported = False
+	upload.save()
+	return jsonify({'success': True})
+
 @api_bp.route('/upload/<upload_id>', methods=['DELETE'])
 def delete_upload(upload_id):
 	rtn = {

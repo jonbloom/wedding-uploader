@@ -36,6 +36,7 @@ class Upload(BaseModel):
 	timestamp = DateTimeField(default=datetime.datetime.now)
 	total_files = IntegerField(default=0)
 	uploaded_files = IntegerField(default=0)
+	reported = BooleanField(default=False)
 	
 class File(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)
