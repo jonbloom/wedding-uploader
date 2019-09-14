@@ -11,7 +11,6 @@ class BaseModel(Model):
 
 class User(BaseModel):
 	uuid = TextField(unique=True, primary_key=True, default=uuid4)
-	email = TextField(unique=True)
 	first_name = TextField()
 	last_name = TextField()
 	is_admin = BooleanField(default=False)
