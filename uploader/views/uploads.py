@@ -24,7 +24,7 @@ def upload():
 	if request.method == 'POST':
 		_upload = Upload()
 		_upload.user = current_user.uuid
-		_upload.title = request.form.get('title')
+		_upload.title = request.form.get('title', None)
 		_upload.total_files = len(request.files.getlist('media'))
 		_upload.save(force_insert=True)
 		if 'media' in request.files:

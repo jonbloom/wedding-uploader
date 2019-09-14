@@ -23,13 +23,13 @@
   </div>
 </div>
 
-<h1><a href="{{url_for('.upload')}}">Upload Images and Videos</a></h1>
+<h1><a class="btn btn-large btn-primary" href="{{url_for('.upload')}}">Upload Images and Videos</a></h1>
 <div class="uploads">
 	
 	
 	<div class="upload mb-5 pb-3" v-for="upload in uploads" {% if not current_user.is_admin %} v-if="!upload.reported" {% endif %}>
 		{% raw %}
-		<h3>{{upload.title}}, Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h3>
+		<h3><span v-if="upload.title">{{upload.title}},</span> Uploaded By: {{upload.user.first_name}} {{upload.user.last_name}}</h3>
 		{% endraw %}
 		{% if current_user.is_admin %}
 		<h5 class="text-danger" @click="deleteUpload(upload.uuid)"> Delete</h5>
