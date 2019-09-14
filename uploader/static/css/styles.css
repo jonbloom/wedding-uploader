@@ -9,10 +9,10 @@ body {
     font-family: 'Kavivanar', cursive;
 }
 
-.btn.btn-primary,
-.btn-primary:not(:disabled):not(.disabled):active,
+.btn-primary, .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:hover
     {
     background-color: #1B4C25;
+    color: white;
 }
 
 .logo-wrap {
@@ -76,5 +76,7 @@ stream {
 .grid-item .image img {
     opacity: 0;
     max-width: 100%;
-
+}
+#home {
+    color: #1B4C25;
 }

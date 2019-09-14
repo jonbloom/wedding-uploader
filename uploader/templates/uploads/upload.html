@@ -16,7 +16,7 @@
                         <input type="file" class="form-control-file" id="media" name="media" multiple accept="image/*,video/*,capture=camcorder" v-on:change="handleFileUploads()" ref="media">
                         <small class="form-text text-muted">You can upload images, videos, both, and multiple at once!</small>
                     </div>
-                    <a class="btn btn-primary btn-large" v-on:click="submit">Upload</a>
+                    <button class="btn btn-primary btn-large" v-on:click="submit">Upload</button>
                 </div>
                 <div class="progress-wrap" v-if="uploading">
                     <div class="progress">
