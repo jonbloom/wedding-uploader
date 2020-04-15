@@ -10,7 +10,7 @@ api_bp = Blueprint('api', __name__)
 @api_bp.route('/uploads')
 def list_uploads():
 	uploads = {
-		'uploads': [model_to_dict(u, backrefs=True, exclude=[User.uuid, User.email, User.is_admin, User.authenticated]) for u in Upload.select().order_by(Upload.timestamp.desc())]
+		'uploads': [model_to_dict(u, backrefs=True, exclude=[User.uuid,User.is_admin, User.authenticated]) for u in Upload.select().order_by(Upload.timestamp.desc())]
 	}
 	return jsonify(uploads)
 

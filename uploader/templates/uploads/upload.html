@@ -9,14 +9,14 @@
                 <div class="form" v-if="!uploading">
                     <div class="form-group">
                         <label for="title">Title:</label>
-                        <input class="form-control" type="text" name="title" placeholder="Enter a title" required="required" v-model="title">
+                        <input class="form-control" type="text" name="title" placeholder="Enter a title (optional)" v-model="title">
                     </div>
                     <div class="form-group">
                         <label for="media">Media:</label>
                         <input type="file" class="form-control-file" id="media" name="media" multiple accept="image/*,video/*,capture=camcorder" v-on:change="handleFileUploads()" ref="media">
                         <small class="form-text text-muted">You can upload images, videos, both, and multiple at once!</small>
                     </div>
-                    <a class="btn btn-primary btn-large" v-on:click="submit">Upload</a>
+                    <button class="btn btn-primary btn-large" v-on:click="submit">Upload</button>
                 </div>
                 <div class="progress-wrap" v-if="uploading">
                     <div class="progress">
@@ -97,7 +97,7 @@
                 }
             },
             valid: function(){
-                return this.title.length > 0 && this.media.length > 0;
+                return this.media.length > 0;
             }
         }
     })

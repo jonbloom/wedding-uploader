@@ -12,11 +12,10 @@ def login():
 		first_name = request.form.get('first_name')
 		last_name = request.form.get('last_name')
 		try:
-			user = User.get(email=email)			
+			user = User.get(first_name=first_name, last_name=last_name)
 			print('found user')
 		except User.DoesNotExist:
 			user = User()
-			user.email = email
 			user.first_name = first_name
 			user.last_name = last_name
 			print('new user')
